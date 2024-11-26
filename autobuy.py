@@ -429,7 +429,7 @@ def generate_hwid():
 
 os.system('cls')
 
-print('Sosok Checker\n11/25/2024\nMade by Vodlex and Allah\nchangelog:\n~ Possibly unflagged auto-buyer\n~ Added password-masking for hits')
+print('Sosok Checker\n11/25/2024 #2\nMade by Vodlex and Allah\nchangelog:\n~ Added auto-setup for VPSes\n~Possibly unflagged auto-buyer\n~ Added password-masking for hits')
 username = input("Enter username: ")
 password = getpass("Enter password: ")
 if authenticate(username, password, generate_hwid()):
