@@ -9,5 +9,5 @@ quantity = 1
 
 [settings.autobuy.autosetup]
 enabled = true
-location = "coming soon"
+location = 11 # 4 - netherlands | 3 - singapore  | 5 - lithuania | 6 - united kingdom | 7 - united states / phoenix | 9 - united states / phoenix | 8 - brazil | 11 - lithuania | 13 - india | 14 - brazil | 15 - france | 17 - united states / boston | 18 - united kingdom / manchester
 password = "nigger123@A?"

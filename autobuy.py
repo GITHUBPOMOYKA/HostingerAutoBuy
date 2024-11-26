@@ -58,7 +58,7 @@ quantity = config['settings']['autobuy']['quantity']
 
 autosetup_enabled = config['settings']['autobuy']['autosetup']['enabled']
 autosetup_passwd = config['settings']['autobuy']['autosetup']['password']
-
+autosetup_location = config['settings']['autobuy']['autosetup']['location']
 
 check_count = 0
 total_checks = 0
@@ -365,15 +365,15 @@ def check():
                                             with open('results/autobuyed.txt', 'a') as f:
                                                 f.write(f'{email}:{passwd}\n')
                                             if autosetup_enabled:
-                                                clientb = httpx.Client(proxy=f'http://{proxy_login}', timeout=60)
+                                                clientb = httpx.Client(proxy=f'http://brd-customer-hl_d2ac0d30-zone-datacenter_proxy1:ewxmmc5ezeom@brd.superproxy.io:33335', timeout=60)
                                                 fetch_vps = clientb.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine?gaid=GA1.2.1570124997.1732580115', headers={
                                                     'Authorization': f'Bearer {jwt}',
                                                 })
-                                                
-                                                setup = clientb.post('https://hpanel.hostinger.com/api/vps/v1/virtual-machine/652268/setup?gaid=GA1.2.1570124997.1732580115', json={
+
+                                                setup = clientb.post(f'https://hpanel.hostinger.com/api/vps/v1/virtual-machine/{fetch_vps.json()['data'][0]['id']}/setup?gaid=GA1.2.1570124997.1732580115', json={
                                                     'template_id': 1077,
-                                                    'data_center_id': 11,
-                                                    'hostname': fetch_vps.json()['data']['hostname'],
+                                                    'data_center_id': autosetup_location,
+                                                    'hostname': fetch_vps.json()['data'][1]['hostname'],
                                                     'panel_password': '',
                                                     'root_password': autosetup_passwd,
                                                     'install_monarx': False,
@@ -388,13 +388,12 @@ def check():
                                                     ipv4_address = setup.json()["data"]["ipv4"][0]["address"]
                                                     print(f"{Fore.LIGHTYELLOW_EX}AUTOSETUP{Fore.RESET} | {Fore.LIGHTGREEN_EX}SUCCESS{Fore.RESET} | "
                                                     f"{Fore.LIGHTYELLOW_EX}IP:{Fore.RESET} {ipv4_address} | "
-                                                    f"{Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(passwd)}")
-                                                    with open('autosettuped.txt', 'a') as f:
+                                                    f"{Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(autosetup_passwd)}")
+                                                    with open('results/autosettuped.txt', 'a') as f:
                                                         f.write(f'root:{autosetup_passwd}@{ipv4_address}:22\n')
                                                 else:
                                                     print(f"{Fore.LIGHTYELLOW_EX}AUTOSETUP{Fore.RESET} | {Fore.RED}FAILED{Fore.RESET} | "
-                                                    f"{Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(passwd)}")
-                                                    print(setup.json())
+                                                    f"{Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(autosetup_passwd)}")
                                         else:
                                             with open('results/autobuy-fails.txt', 'a') as f:
                                                 f.write(f'{email}:{passwd} DEBUG: {pay_balls.status_code} , {pay_balls_response} , {pay_balls.text}\n')
