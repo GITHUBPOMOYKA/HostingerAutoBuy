@@ -1,0 +1,13 @@
+[settings.proxies]
+login = "brd-customer-hl_d2ac0d30-zone-datacenter_proxy1:ewxmmc5ezeom@brd.superproxy.io:33335"
+autobuy = "dortation:YesYesYesFunnyYesYesYes@useful.sys32.dev:10808"
+
+[settings.autobuy]
+enabled = true
+vpsplan = "hostingercom-vps-kvm1-usd-1m"
+quantity = 1
+
+[settings.autobuy.autosetup]
+enabled = true
+location = "coming soon"
+password = "nigger123@A?"
