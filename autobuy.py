@@ -42,7 +42,7 @@ proxy_login = config['settings']['proxies']['login']
 proxy_autobuy = config['settings']['proxies']['autobuy']
 
 webhook_enabled = config['settings']['discord']['webhook']['enabled']
-webhook_url = config['settings']['discord']['webhook']
+webhook_url = config['settings']['discord']['webhook']['url']
 autobuy_message = config['settings']['discord']['webhook']['autobuy-message']
 
 autobuy_enabled = config['settings']['autobuy']['enabled']
@@ -420,9 +420,9 @@ def check():
                 print("CHECKING DONE.")
                 sys.exit()
 
-title_thread = threading.Thread(target=update_title)
-title_thread.daemon = True
-title_thread.start()
+# title_thread = threading.Thread(target=update_title)
+# title_thread.daemon = True
+# title_thread.start()
 threads = [threading.Thread(target=check) for _ in range(int(input('Threads: ')))]
 for t in threads: t.start()
 for t in threads: t.join()
