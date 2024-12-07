@@ -1,5 +1,5 @@
 [settings.proxies]
-login = "brd-customer-hl_e3bcae7a-zone-datacenter_proxy1:g3akz8f4ilyo@brd.superproxy.io:33335"
+login = "brd-customer-hl_28ef4527-zone-datacenter_proxy1:f84b1uyklgf3@brd.superproxy.io:33335"
 autobuy = "dortation:YesYesYesFunnyYesYesYes@useful.sys32.dev:10808"
 
 [settings.discord.webhook]
@@ -9,10 +9,10 @@ autobuy-message = "[AUTO-BUYER] Purchased Successfully, Plan [plan] ($[plan_pric
 
 [settings.autobuy]
 enabled = true
-vpsplan = "hostingercom-vps-kvm1-usd-1m"
+vpsplan = "hostingercom-vps-kvm8-usd-1m"
 quantity = 1
 
 [settings.autobuy.autosetup]
-enabled = false
+enabled = true
 location = 11 # 4 - netherlands | 3 - singapore  | 5 - lithuania | 6 - united kingdom | 7 - united states / phoenix | 9 - united states / phoenix | 8 - brazil | 11 - lithuania | 13 - india | 14 - brazil | 15 - france | 17 - united states / boston | 18 - united kingdom / manchester
 password = "nigger123@A?"
